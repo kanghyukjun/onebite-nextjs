@@ -1,0 +1,46 @@
+.searchbar_container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+@keyframes changeColor {
+  0% {
+    border: 1px solid rgb(220, 220, 220);
+  }
+  100% {
+    border: 1px solid rgb(37, 147, 255);
+  }
+}
+
+@keyframes changeColorReverse {
+  0% {
+    border: 1px solid rgb(37, 147, 255);
+  }
+  100% {
+    border: 1px solid rgb(220, 220, 220);
+  }
+}
+
+.searchbar_container > input {
+  flex: 1;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid rgb(220, 220, 220);
+  animation: changeColorReverse 0.2s;
+}
+
+.searchbar_container > input:focus {
+  border: 1px solid rgb(37, 147, 255);
+  outline: none;
+  animation: changeColor 0.2s;
+}
+
+.searchbar_container > button {
+  border: none;
+  width: 80px;
+  border-radius: 5px;
+  background-color: rgb(37, 147, 255);
+  color: white;
+  cursor: pointer;
+}
