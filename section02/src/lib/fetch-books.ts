@@ -1,7 +1,7 @@
 import type { BookData } from "@/types";
 
 export default async function fetchBooks(q?: string): Promise<BookData[]> {
-  let url = `http://localhost:12345/book`;
+  let url = `http://127.0.0.1:12345/book`;
   if (q) {
     url += `/search?q=${q}`;
   }
