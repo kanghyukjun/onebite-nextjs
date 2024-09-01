@@ -1,35 +1,29 @@
 import { BookData } from "@/types";
 import style from "./page.module.css";
+import { notFound } from "next/navigation";
 
-export default async function Page({
-  params,
-}: {
-  params: { id: string | string[] };
-}) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${params.id}`
-  );
+// export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return [{ id: "1" }, { id: "2" }, { id: "3" }];
+}
+
+export default async function Page({ params }: { params: { id: string | string[] } }) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${params.id}`);
 
   if (!response.ok) {
+    if (response.status === 404) {
+      notFound();
+    }
+
     return <div>오류야~</div>;
   }
 
-  const {
-    id,
-    title,
-    subTitle,
-    description,
-    author,
-    publisher,
-    coverImgUrl,
-  }: BookData = await response.json();
+  const { id, title, subTitle, description, author, publisher, coverImgUrl }: BookData = await response.json();
 
   return (
     <div className={style.container}>
-      <div
-        className={style.cover_img_container}
-        style={{ backgroundImage: `url('${coverImgUrl}')` }}
-      >
+      <div className={style.cover_img_container} style={{ backgroundImage: `url('${coverImgUrl}')` }}>
         <img src={coverImgUrl} />
       </div>
       <div className={style.title}>{title}</div>
