@@ -1,18 +1,15 @@
-import { BookData } from "@/types";
+import { BookData, ReviewData } from "@/types";
 import style from "./page.module.css";
 import { notFound } from "next/navigation";
-import { writeContent } from "@/action/write-content.action";
-
-// export const dynamicParams = false;
+import ReviewItem from "@/components/review-item";
+import ReviewEditor from "@/components/review-editor";
 
 export function generateStaticParams() {
   return [{ id: "1" }, { id: "2" }, { id: "3" }];
 }
 
 async function BookDetail({ bookId }: { bookId: string }) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${bookId}`
-  );
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${bookId}`);
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -22,22 +19,11 @@ async function BookDetail({ bookId }: { bookId: string }) {
     return <div>오류야~</div>;
   }
 
-  const {
-    id,
-    title,
-    subTitle,
-    description,
-    author,
-    publisher,
-    coverImgUrl,
-  }: BookData = await response.json();
+  const { id, title, subTitle, description, author, publisher, coverImgUrl }: BookData = await response.json();
 
   return (
     <section>
-      <div
-        className={style.cover_img_container}
-        style={{ backgroundImage: `url('${coverImgUrl}')` }}
-      >
+      <div className={style.cover_img_container} style={{ backgroundImage: `url('${coverImgUrl}')` }}>
         <img src={coverImgUrl} />
       </div>
       <div className={style.title}>{title}</div>
@@ -50,14 +36,21 @@ async function BookDetail({ bookId }: { bookId: string }) {
   );
 }
 
-function Content({ bookId }: { bookId: string }) {
+async function ReviewList({ bookId }: { bookId: string }) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/review/book/${bookId}`);
+
+  if (!response.ok) {
+    throw new Error(`Review fetch failed: ${response.statusText}`);
+  }
+
+  const reviews: ReviewData[] = await response.json();
+
   return (
-    <form action={writeContent}>
-      <input required type="text" name="content" placeholder="댓글 내용" />
-      <input required type="text" name="author" placeholder="작성자" />
-      <input hidden type="text" name="bookId" value={bookId} />
-      <button type="submit">등록</button>
-    </form>
+    <section>
+      {reviews.map((review) => (
+        <ReviewItem key={review.id} {...review} />
+      ))}
+    </section>
   );
 }
 
@@ -65,7 +58,8 @@ export default async function Page({ params }: { params: { id: string } }) {
   return (
     <div className={style.container}>
       <BookDetail bookId={params.id} />
-      <Content bookId={params.id} />
+      <ReviewEditor bookId={params.id} />
+      <ReviewList bookId={params.id} />
     </div>
   );
 }
